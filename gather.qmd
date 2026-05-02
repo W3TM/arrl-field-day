@@ -1,0 +1,71 @@
+# Gather
+
+## About
+
+This page documents the process of gathering Field Day data from the ARRL website.
+
+## Download
+
+The ARRL has comma-separated value (text) files for Field Day results here: <https://field-day.arrl.org/fdresults.php>.
+
+CSV data are available for 2010-2025.
+
+::: {.callout-note}
+## Future work
+
+QST articles go back to 2000, so the results from 2000-2009 could eventually be extracted from these PDF files and turned into actionable data.
+
+:::
+
+Create functions to download the data given year as an input.
+
+```{r}
+#| label: specify-helper-function
+download_fd_data <- function(year = 2025) {
+  assertthat::is.number(year)
+  assertthat::assert_that(year > 0)
+  
+  url <- paste0("https://contests.arrl.org/ContestResults/", year, "/field-day-", year, ".csv")
+  readr::read_csv(url, show_col_types = FALSE)
+}
+```
+
+```{r}
+#| label: save-fd-data
+save_fd_data <- function(df, year, data_dir = "data/raw", force_create_dir = TRUE) {
+  assertthat::assert_that(tibble::is_tibble(df))
+  
+  assertthat::is.number(year)
+  assertthat::assert_that(year > 0)
+  
+  assertthat::is.string(data_dir)
+  assertthat::assert_that(is.logical(force_create_dir))
+  if (!assertthat::is.writeable(data_dir)) {
+    if (force_create_dir) {
+      dir.create(data_dir)
+    } else {
+      warning(paste0(data_dir, " does not exist. Exiting."))
+      return()
+    }
+  }
+  
+  fn <- file.path(data_dir, paste0("field-day-", year, ".csv"))
+  readr::write_csv(df, fn)
+} 
+```
+
+```{r}
+download_save_df_data <- function(year = 2025) {
+  df <- download_fd_data(year)
+  save_fd_data(df, year)
+}
+```
+
+With these functions, we can use the {purrr} package to download and save all of the available data files.
+
+```{r}
+#| label: download-save-2010-2025
+years <- c(2010:2025)
+purrr::map(years, download_save_df_data, .progress = TRUE)
+```
+

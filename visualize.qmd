@@ -1,0 +1,36 @@
+# Visualize
+
+## About
+
+This page documents visualizations of the ARRL Field Day 2010-2025 data.
+
+## Setup
+
+```{r}
+library(ggplot2)
+```
+
+
+## Import
+
+```{r}
+fd <- readr::read_csv("data/aggregate/field-day-2010-2025.csv", show_col_types = FALSE)
+```
+
+## Scores
+
+```{r}
+fd |>
+  ggplot() +
+  facet_wrap(vars(year), ncol = 4) +
+  geom_histogram(aes(x = final_score))
+```
+
+```{r}
+fd |>
+  dplyr::group_by(year) |>
+  dplyr::summarize(min_score = min(final_score),
+                median_score = median(final_score),
+                max_score = max(final_score))
+```
+

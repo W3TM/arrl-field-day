@@ -1,0 +1,346 @@
+# Clean
+
+## About
+
+This page documents the process of cleaning the 2010-2025 ARRL Field Day data.
+
+The datasets have different field names across the years, so the field names must be normalized in order to combine the datasets for visualization.
+
+## Tidy names
+
+```{r}
+clean_fd_names_save <- function(fn, clean_file_dir = "data/cleaned") {
+  assertthat::is.string(fn)
+  assertthat::is.readable(fn)
+  
+  df <- readr::read_csv(fn, show_col_types = FALSE)
+  assertthat::assert_that(tibble::is_tibble(df))
+  
+  # Clean names
+  df_clean <- janitor::clean_names(df)
+
+  fn_no_ext <- basename(tools::file_path_sans_ext(fn))
+  fn <- file.path(clean_file_dir, paste0(fn_no_ext, "-clean-names.csv"))
+  readr::write_csv(df_clean, fn)
+  fn
+}
+```
+
+Clean all names for all files in `data/raw`.
+
+```{r}
+fl <- list.files("data/raw", full.names = TRUE)
+
+purrr::map(fl, clean_fd_names_save)
+```
+
+## Exploration
+
+Let's explore the column names to see which ones represent the same data.
+
+```{r}
+show_names <- function(fn) {
+  assertthat::is.string(fn)
+  assertthat::is.readable(fn)
+  
+  df <- readr::read_csv(fn, show_col_types = FALSE)
+  assertthat::assert_that(tibble::is_tibble(df))
+  file_year <- stringr::str_extract(fn, pattern = "[0-9]{4}")
+  sprintf("%s\n", paste0("--- ", file_year, " ---"))
+  names(df)
+}
+
+fl <- list.files("data/cleaned", pattern = "clean-names", full.names = TRUE)
+
+purrr::map(fl, show_names)
+```
+
+```{r}
+fd_dfs <- purrr::map(fl, readr::read_csv)
+janitor::compare_df_cols(fd_dfs)
+```
+
+## Rename by variable and year
+
+```{r}
+fd2010 <- readr::read_csv(file = "data/cleaned/field-day-2010-clean-names.csv", 
+                          show_col_types = FALSE)
+names(fd2010)
+
+fd2010 <- fd2010 |>
+  dplyr::rename("section" = "sec") |>
+  dplyr::mutate(transmitters = stringr::str_extract(class, pattern = "[0-9]+"))
+
+readr::write_csv(fd2010, file = "data/cleaned/field-day-2010-normed.csv")
+```
+
+```{r}
+fd2011 <- readr::read_csv(file = "data/cleaned/field-day-2011-clean-names.csv", 
+                          show_col_types = FALSE)
+names(fd2011)
+
+fd2011 <- fd2011 |>
+  dplyr::rename("section" = "sec") |>
+  dplyr::mutate(transmitters = stringr::str_extract(class, pattern = "[0-9]+"))
+
+readr::write_csv(fd2011, file = "data/cleaned/field-day-2011-normed.csv")
+```
+
+```{r}
+fd2012 <- readr::read_csv(file = "data/cleaned/field-day-2012-clean-names.csv", 
+                          show_col_types = FALSE)
+names(fd2012)
+
+fd2012 <- fd2012 |>
+  dplyr::rename("section" = "sec") |>
+  dplyr::mutate(transmitters = stringr::str_extract(class, pattern = "[0-9]+"))
+
+readr::write_csv(fd2012, file = "data/cleaned/field-day-2012-normed.csv")
+```
+
+```{r}
+fd2013 <- readr::read_csv(file = "data/cleaned/field-day-2013-clean-names.csv", 
+                          show_col_types = FALSE)
+names(fd2013)
+
+fd2013 <- fd2013 |>
+  dplyr::rename("section" = "sec") |>
+  dplyr::mutate(transmitters = stringr::str_extract(class, pattern = "[0-9]+"))
+
+readr::write_csv(fd2013, file = "data/cleaned/field-day-2013-normed.csv")
+```
+
+```{r}
+fd2014 <- readr::read_csv(file = "data/cleaned/field-day-2014-clean-names.csv", 
+                          show_col_types = FALSE)
+names(fd2014)
+
+fd2014 <- fd2014 |>
+  dplyr::rename("section" = "sec") |>
+  dplyr::mutate(transmitters = stringr::str_extract(class, pattern = "[0-9]+"))
+
+readr::write_csv(fd2014, file = "data/cleaned/field-day-2014-normed.csv")
+```
+
+```{r}
+fd2015 <- readr::read_csv(file = "data/cleaned/field-day-2015-clean-names.csv", 
+                          show_col_types = FALSE)
+names(fd2015)
+
+fd2015 <- fd2015 |>
+  dplyr::rename("section" = "sec") |>
+  dplyr::mutate(transmitters = stringr::str_extract(class, pattern = "[0-9]+"))
+
+readr::write_csv(fd2015, file = "data/cleaned/field-day-2015-normed.csv")
+```
+
+```{r}
+fd2016 <- readr::read_csv(file = "data/cleaned/field-day-2016-clean-names.csv", 
+                          show_col_types = FALSE)
+names(fd2016)
+
+fd2016 <- fd2016 |>
+  dplyr::rename(total_cw_qsos = total_cw_qs_os,
+                total_phone_qsos = total_phone_qs_os,
+                total_digital_qsos = total_digital_qs_os,
+                class = category,
+                transmitters = number_of_transmitters)
+
+readr::write_csv(fd2016, file = "data/cleaned/field-day-2016-normed.csv")
+```
+
+```{r}
+fd2017 <- readr::read_csv(file = "data/cleaned/field-day-2017-clean-names.csv", 
+                          show_col_types = FALSE)
+names(fd2017)
+
+fd2017 <- fd2017 |>
+  dplyr::rename(total_cw_qsos = total_cw_qs_os,
+                total_phone_qsos = total_phone_qs_os,
+                total_digital_qsos = total_digital_qs_os,
+                call = call_does_not_include_checklogs,
+                class = category,
+                transmitters = number_of_transmitters)
+
+readr::write_csv(fd2017, file = "data/cleaned/field-day-2017-normed.csv")
+```
+
+```{r}
+fd2018 <- readr::read_csv(file = "data/cleaned/field-day-2018-clean-names.csv", 
+                          show_col_types = FALSE)
+names(fd2018)
+
+fd2018 <- fd2018 |>
+  dplyr::rename(total_cw_qsos = total_cw_qs_os,
+                total_phone_qsos = total_phone_qs_os,
+                total_digital_qsos = total_digital_qs_os,
+                class = qst_class_plus,
+                transmitters = number_of_transmitters)
+
+readr::write_csv(fd2018, file = "data/cleaned/field-day-2018-normed.csv")
+```
+
+```{r}
+fd2019 <- readr::read_csv(file = "data/cleaned/field-day-2019-clean-names.csv", 
+                          show_col_types = FALSE)
+names(fd2019)
+
+fd2019 <- fd2019 |>
+  dplyr::rename(total_cw_qsos = total_cw_qs_os,
+                total_phone_qsos = total_phone_qs_os,
+                total_digital_qsos = total_digital_qs_os,
+                total_qsos = total_qs_os,
+                class = qst_class,
+                number_of_participants = participants,
+                transmitters = xmtrs)
+
+readr::write_csv(fd2019, file = "data/cleaned/field-day-2019-normed.csv")
+```
+
+```{r}
+fd2020 <- readr::read_csv(file = "data/cleaned/field-day-2020-clean-names.csv", 
+                          show_col_types = FALSE)
+names(fd2020)
+
+fd2020 <- fd2020 |>
+  dplyr::rename(total_cw_qsos = total_cw_qs_os,
+                total_phone_qsos = total_phone_qs_os,
+                total_digital_qsos = total_digital_qs_os,
+                total_qsos = total_qs_os,
+                class = category,
+                number_of_participants = participants,
+                final_score = score,
+                transmitters = xmtrs,
+                power_multiplier = pwr_mult)
+
+readr::write_csv(fd2020, file = "data/cleaned/field-day-2020-normed.csv")
+```
+
+```{r}
+fd2021 <- readr::read_csv(file = "data/cleaned/field-day-2021-clean-names.csv", 
+                          show_col_types = FALSE)
+names(fd2021)
+
+fd2021 <- fd2021 |>
+  dplyr::rename(total_cw_qsos = total_cw_qs_os,
+                total_phone_qsos = total_phone_qs_os,
+                total_digital_qsos = total_digital_qs_os,
+                total_qsos = total_qs_os,
+                class = category,
+                number_of_participants = participants,
+                final_score = score,
+                transmitters = xmtrs,
+                power_multiplier = pwr_mult)
+
+readr::write_csv(fd2021, file = "data/cleaned/field-day-2021-normed.csv")
+```
+
+```{r}
+fd2022 <- readr::read_csv(file = "data/cleaned/field-day-2022-clean-names.csv", 
+                          show_col_types = FALSE)
+names(fd2022)
+
+fd2022 <- fd2022 |>
+  dplyr::rename(total_cw_qsos = total_cw_qs_os,
+                total_phone_qsos = total_phone_qs_os,
+                total_digital_qsos = total_digital_qs_os,
+                total_qsos = total_qs_os,
+                class = category,
+                number_of_participants = participants)
+
+readr::write_csv(fd2022, file = "data/cleaned/field-day-2022-normed.csv")
+```
+
+```{r}
+fd2023 <- readr::read_csv(file = "data/cleaned/field-day-2023-clean-names.csv", 
+                          show_col_types = FALSE)
+names(fd2023)
+
+fd2023 <- fd2023 |>
+  dplyr::rename(total_cw_qsos = total_cw_qs_os,
+                total_phone_qsos = total_phone_qs_os,
+                total_digital_qsos = total_digital_qs_os,
+                total_qsos = total_qs_os,
+                class = category,
+                number_of_participants = participants)
+
+readr::write_csv(fd2023, file = "data/cleaned/field-day-2023-normed.csv")
+```
+
+```{r}
+fd2024 <- readr::read_csv(file = "data/cleaned/field-day-2024-clean-names.csv", 
+                          show_col_types = FALSE)
+names(fd2024)
+
+fd2024 <- fd2024 |>
+  dplyr::rename(total_cw_qsos = total_cw_qs_os,
+                total_phone_qsos = total_phone_qs_os,
+                total_digital_qsos = total_digital_qs_os,
+                total_qsos = total_qs_os,
+                class = category,
+                number_of_participants = participants)
+
+readr::write_csv(fd2024, file = "data/cleaned/field-day-2024-normed.csv")
+```
+
+```{r}
+fd2025 <- readr::read_csv(file = "data/cleaned/field-day-2025-clean-names.csv", 
+                          show_col_types = FALSE)
+names(fd2025)
+
+fd2025 <- fd2025 |>
+  dplyr::rename(total_cw_qsos = total_cw_qs_os,
+                total_phone_qsos = total_phone_qs_os,
+                total_digital_qsos = total_digital_qs_os, 
+                total_qsos = total_qs_os,
+                class = category,
+                number_of_participants = participants)
+
+readr::write_csv(fd2025, file = "data/cleaned/field-day-2025-normed.csv")
+```
+
+Let's now check again.
+
+```{r}
+fd_dfs <- list(
+  fd2010,
+  fd2011,
+  fd2012,
+  fd2013,
+  fd2014,
+  fd2015,
+  fd2016,
+  fd2017,
+  fd2018,
+  fd2019,
+  fd2020,
+  fd2021,
+  fd2022,
+  fd2023,
+  fd2024,
+  fd2025
+)
+
+janitor::compare_df_cols(fd_dfs)
+```
+
+## Merge cleaned
+
+```{r}
+import_add_year <- function(fn) {
+  assertthat::is.string(fn)
+  assertthat::is.readable(fn)
+  
+  df <- readr::read_csv(fn, show_col_types = FALSE)
+  assertthat::assert_that(tibble::is_tibble(df))
+  df$year <- stringr::str_extract(fn, "[0-9]{4}")
+  df
+}
+fl <- list.files("data/cleaned", pattern = "normed", full.names = TRUE)
+
+fd_all_df <- purrr::map(fl, import_add_year) |>
+  purrr::list_rbind()
+
+readr::write_csv(fd_all_df, file = "data/aggregate/field-day-2010-2025.csv")
+```
+
