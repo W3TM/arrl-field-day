@@ -4,3 +4,6 @@
 .Ruserdata
 .positai
 arrl-field-day.Rproj
+
+/.quarto/
+**/*.quarto_ipynb

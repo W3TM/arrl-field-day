@@ -6,31 +6,235 @@ This page documents visualizations of the ARRL Field Day 2010-2025 data.
 
 ## Setup
 
+Here I `source` the {ggplot2} library to make it easier to make plots later. I also define some default colors for those plots. Defining these here makes it easier to modify them site-wide later on.
+
 ```{r}
 library(ggplot2)
+
+max_color = "red"
+median_color = "blue"
+tot_color = "green"
 ```
 
-
 ## Import
+
+The gathering and cleaning pages handle those functions. They save a cleaned data file that we reimport here.
+
+::: {.callout-important}
+## DRY WIT
+
+A popular adage in computer science and data science is DRY WIT: Don't Repeat Yourself; Write It Down.
+
+I adopt that mantra here by automating each step and by saving the intermediate products.
+
+:::
 
 ```{r}
 fd <- readr::read_csv("data/aggregate/field-day-2010-2025.csv", show_col_types = FALSE)
 ```
 
-## Scores
+## Generate summaries
+
+To begin, we create a smaller data summary.
 
 ```{r}
-fd |>
-  ggplot() +
-  facet_wrap(vars(year), ncol = 4) +
-  geom_histogram(aes(x = final_score))
-```
-
-```{r}
-fd |>
+fd_by_year <- fd |>
   dplyr::group_by(year) |>
-  dplyr::summarize(min_score = min(final_score),
-                median_score = median(final_score),
-                max_score = max(final_score))
+  dplyr::summarize(
+    median_score = median(final_score, na.rm = TRUE),
+    max_score = max(final_score, na.rm = TRUE),
+    tot_score = sum(final_score, na.rm = TRUE),
+    median_xmtrs = median(transmitters),
+    max_xmtrs = max(transmitters),
+    median_particip = median(number_of_participants, na.rm = TRUE),
+    max_particip = max(number_of_participants, na.rm = TRUE),
+    tot_particip = sum(number_of_participants, na.rm = TRUE),
+    median_qsos = median(total_qsos, na.rm = TRUE),
+    max_qsos = max(total_qsos, na.rm = TRUE),
+    tot_qsos = sum(total_qsos, na.rm = TRUE),
+    n_stations = length(unique(call))
+  )
 ```
 
+## Scores by year
+
+This section visualizes Field Day scores across the 2010-2025 period.
+
+::: {.panel-tabset}
+
+### Median
+
+```{r}
+#| label: fig-fd-median-score-2010-2025
+#| fig-cap: "Median Field Day score 2010-2025"
+fd_by_year |>
+  ggplot() +
+  geom_point(aes(x = year, y = median_score)) +
+  geom_line(aes(x = year, y = median_score), color = median_color) +
+  ylab("Median score")
+```
+
+### Maximum
+
+```{r}
+#| label: fig-fd-max-score-2010-2025
+#| fig-cap: "Maximum Field Day score 2010-2025"
+fd_by_year |>
+  ggplot() +
+  geom_point(aes(x = year, y = max_score)) +
+  geom_line(aes(x = year, y = max_score), color = max_color) +
+  ylab("Max score")
+```
+
+### Maximum & median
+
+```{r}
+#| label: fig-fd-max-median-scores-2010-2015
+#| fig-cap: "Maximum (red) and median (blue) Field Day scores 2010-2025"
+fd_by_year |>
+  ggplot() +
+  geom_line(aes(x = year, y = max_score), color = max_color) +
+  geom_line(aes(x = year, y = median_score), color = median_color) +
+  ylab("score")
+```
+
+### Total
+
+```{r}
+#| label: fig-fd-total-score-2010-2025
+#| fig-cap: "Total Field Day scores 2010-2025"
+fd_by_year |>
+  ggplot() +
+  geom_line(aes(x = year, y = tot_score), color = tot_color) +
+  ylab("Score total")
+```
+
+:::
+
+## Participants by year
+
+The following plots show data about the number of participants per station per year.
+
+::: {.panel-tabset}
+
+### Median
+
+```{r}
+fd_by_year |>
+  ggplot() +
+  geom_point(aes(x = year, y = median_particip)) +
+  geom_line(aes(x = year, y = median_particip), color = median_color) +
+  ylab("Median participants/station")
+```
+
+### Maximum
+
+```{r}
+fd_by_year |>
+  ggplot() +
+  geom_point(aes(x = year, y = max_particip)) +
+  geom_line(aes(x = year, y = max_particip), color = max_color) +
+  ylab("Maximum participants/station")
+```
+
+### Max & median
+
+```{r}
+#| label: fig-fd-max-median-particip-2010-2015
+#| fig-cap: "Maximum (red) and median (blue) Field Day scores 2010-2025"
+fd_by_year |>
+  ggplot() +
+  geom_line(aes(x = year, y = max_particip), color = max_color) +
+  geom_line(aes(x = year, y = median_particip), color = median_color) +
+  ylab("Participants/station")
+```
+
+### Total
+
+```{r}
+fd_by_year |>
+  ggplot() +
+  geom_line(aes(x = year, y = tot_particip), color = tot_color) +
+  ylab("Total participants")
+```
+
+:::
+
+## QSOs by year
+
+::: {.panel-tabset}
+
+### Median
+
+```{r}
+#| label: fig-fd-median-qsos-2010-2025
+#| fig-cap: "Median Field Day QSOs/station 2010-2025"
+fd_by_year |>
+  ggplot() +
+  geom_point(aes(x = year, y = median_qsos)) +
+  geom_line(aes(x = year, y = median_qsos), color = median_color) +
+  ylab("Median QSOs/station")
+```
+
+### Maximum
+
+```{r}
+#| label: fig-fd-max-qsos-2010-2025
+#| fig-cap: "Maximum Field Day QSOs/station 2010-2025"
+fd_by_year |>
+  ggplot() +
+  geom_point(aes(x = year, y = max_qsos)) +
+  geom_line(aes(x = year, y = max_qsos), color = max_color) +
+  ylab("Max QSOs")
+```
+
+### Maximum & median
+
+```{r}
+#| label: fig-fd-max-median-qsos-2010-2015
+#| fig-cap: "Maximum (red) and median (blue) Field Day QSOs/station 2010-2025"
+fd_by_year |>
+  ggplot() +
+  geom_line(aes(x = year, y = max_qsos), color = max_color) +
+  geom_line(aes(x = year, y = median_qsos), color = median_color) +
+  ylab("Max & median QSOs")
+```
+
+### Total
+
+```{r}
+#| label: fig-fd-total-qsos-2010-2025
+#| fig-cap: "Total Field Day QSOs 2010-2025"
+fd_by_year |>
+  ggplot() +
+  geom_line(aes(x = year, y = tot_qsos), color = tot_color) +
+  ylab("Total QSOs")
+```
+
+:::
+
+## Participating stations
+
+This section visualizes data about the participating stations.
+
+```{r}
+#| label: fig-fd-n-stations-2010-2025
+#| fig-cap: "Number of participating stations 2010-2025"
+
+fd_by_year |>
+  ggplot() +
+  geom_line(aes(x = year, y = n_stations), color = tot_color) +
+  ylab("Total participating stations")  
+```
+
+## Transmitters
+
+```{r}
+#| label: fig-fd-max-median-xmtrs-2010-2015
+#| fig-cap: "Maximum (red) and median (blue) Field Day transmitters/station 2010-2025"
+fd_by_year |>
+  ggplot() +
+  geom_line(aes(x = year, y = max_xmtrs), color = max_color) +
+  geom_line(aes(x = year, y = median_xmtrs), color = median_color) +
+  ylab("Max & median transmitters")
+```

@@ -1,0 +1,28 @@
+# 
+
+![2026 Field Day logo from <https://www.arrl.org/field-day>](https://www.arrl.org/files/file/Field-Day/2026/Field%20Day%202026%20Logo.jpg){#fig-arrl-2026-field-day-logo}
+
+## About
+
+Welcome to my Field Day data site.
+
+Separate pages describe how I [gathered the data](gather.qmd), [cleaned it](clean.qmd), and generated [visualizations](visualize.qmd).
+
+The data come from the ARRL, and for now^[Data from 2000-2009 are available in PDF form but must be converted to text data before they can be included.] cover 2010-2025.
+
+## Background
+
+I created this as a fun exercise to help motivate my local club members to get more involved in Field Day.
+That entailed a deep dive into the club's past involvement in Field Day with a view toward setting goals for future events.
+Data about our club's activity can be found [here](https://nittany-amateur-radio-club.github.io/field-day/results.html).
+
+After some exploration of the data focused on the club, I realized that the broader dataset might be of interest to others.
+
+::: {.callout-important}
+## Work in progress
+
+This is a work in-progress.
+
+Results may change without notice.
+
+:::

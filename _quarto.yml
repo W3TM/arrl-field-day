@@ -1,0 +1,38 @@
+project:
+  type: book
+  output-dir: docs
+    
+book:
+  title: "By the Numbers"
+  subtitle: "ARRL Field Day results 2010-2015"
+  author: "Rick Gilmore, W3TM"
+  chapters:
+    - index.qmd
+    - gather.qmd
+    - clean.qmd
+    - visualize.qmd
+  repo-url: https://github.com/w3tm/arrl-field-day/
+  repo-actions: [edit, issue]
+  page-footer:
+    left:
+      - text: "© 2026 by Rick Gilmore under CC BY 4.0"
+        href: https://creativecommons.org/licenses/by/4.0/
+    center: 
+      - text: "Built with Quarto"
+        href: https://quarto.org
+knitr:
+  opts_chunk:
+    fig.path: include/fig/ 
+
+format:
+  html:
+    theme: cosmo
+    number-sections: false
+    date-modified: last-modified
+    link-external-icon: true
+    citations-hover: false
+    footnotes-hover: false
+    crossrefs-hover: true
+    code-tools: true
+    code-fold: true
+    
