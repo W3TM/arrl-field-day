@@ -324,6 +324,7 @@ fd_dfs <- list(
 janitor::compare_df_cols(fd_dfs)
 ```
 
+
 ## Merge cleaned
 
 ```{r}
@@ -336,11 +337,24 @@ import_add_year <- function(fn) {
   df$year <- stringr::str_extract(fn, "[0-9]{4}")
   df
 }
+
 fl <- list.files("data/cleaned", pattern = "normed", full.names = TRUE)
 
 fd_all_df <- purrr::map(fl, import_add_year) |>
   purrr::list_rbind()
+```
 
+## Computed variables
+
+```{r}
+fd_all_df <- fd_all_df |>
+  dplyr::mutate(op_class = stringr::str_extract(class, pattern = "[A-Z]{1}"),
+                call_area = stringr::str_extract(call, pattern = "[0-9]{1}"))
+```
+
+## Save cleaned
+
+```{r}
 readr::write_csv(fd_all_df, file = "data/aggregate/field-day-2010-2025.csv")
 ```
 

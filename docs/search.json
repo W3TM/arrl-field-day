@@ -94,7 +94,7 @@
     "href": "clean.html#merge-cleaned",
     "title": "Clean",
     "section": "Merge cleaned",
-    "text": "Merge cleaned\n\n\nCode\nimport_add_year &lt;- function(fn) {\n  assertthat::is.string(fn)\n  assertthat::is.readable(fn)\n  \n  df &lt;- readr::read_csv(fn, show_col_types = FALSE)\n  assertthat::assert_that(tibble::is_tibble(df))\n  df$year &lt;- stringr::str_extract(fn, \"[0-9]{4}\")\n  df\n}\nfl &lt;- list.files(\"data/cleaned\", pattern = \"normed\", full.names = TRUE)\n\nfd_all_df &lt;- purrr::map(fl, import_add_year) |&gt;\n  purrr::list_rbind()\n\nreadr::write_csv(fd_all_df, file = \"data/aggregate/field-day-2010-2025.csv\")",
+    "text": "Merge cleaned\n\n\nCode\nimport_add_year &lt;- function(fn) {\n  assertthat::is.string(fn)\n  assertthat::is.readable(fn)\n  \n  df &lt;- readr::read_csv(fn, show_col_types = FALSE)\n  assertthat::assert_that(tibble::is_tibble(df))\n  df$year &lt;- stringr::str_extract(fn, \"[0-9]{4}\")\n  df\n}\n\nfl &lt;- list.files(\"data/cleaned\", pattern = \"normed\", full.names = TRUE)\n\nfd_all_df &lt;- purrr::map(fl, import_add_year) |&gt;\n  purrr::list_rbind()",
     "crumbs": [
       "<span class='chapter-number'>3</span>  <span class='chapter-title'>Clean</span>"
     ]
@@ -197,6 +197,26 @@
     "text": "About\nWelcome to my Field Day data site.\nSeparate pages describe how I gathered the data, cleaned it, and generated visualizations.\nThe data come from the ARRL, and for now1 cover 2010-2025.",
     "crumbs": [
       "<span class='chapter-number'>1</span>  <span class='chapter-title'>About</span>"
+    ]
+  },
+  {
+    "objectID": "clean.html#computed-variables",
+    "href": "clean.html#computed-variables",
+    "title": "Clean",
+    "section": "Computed variables",
+    "text": "Computed variables\n\n\nCode\nfd_all_df &lt;- fd_all_df |&gt;\n  dplyr::mutate(op_class = stringr::str_extract(class, pattern = \"[A-Z]{1}\"),\n                call_area = stringr::str_extract(call, pattern = \"[0-9]{1}\"))",
+    "crumbs": [
+      "<span class='chapter-number'>3</span>  <span class='chapter-title'>Clean</span>"
+    ]
+  },
+  {
+    "objectID": "clean.html#save-cleaned",
+    "href": "clean.html#save-cleaned",
+    "title": "Clean",
+    "section": "Save cleaned",
+    "text": "Save cleaned\n\n\nCode\nreadr::write_csv(fd_all_df, file = \"data/aggregate/field-day-2010-2025.csv\")",
+    "crumbs": [
+      "<span class='chapter-number'>3</span>  <span class='chapter-title'>Clean</span>"
     ]
   }
 ]
